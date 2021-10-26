@@ -12,8 +12,8 @@ const calcMatrixNormal = (m1, m2) => {
     const row = m1[idx];
     return range(4).map(jdx => {
       const col = m2[jdx];
-      const val = range(4).reduce((pv, cv, kdx) => {
-        const rv = row[kdx] * col[kdx];
+      const val = range(4).reduce((pv, cv) => {
+        const rv = row[cv] * col[cv];
         return pv + rv;
       }, 0)
       console.log(val);
@@ -21,7 +21,6 @@ const calcMatrixNormal = (m1, m2) => {
     })
   })
 
-  console.log(result);
   return result;
 }
 
@@ -38,9 +37,20 @@ function getMatrixValues(tableDom) {
     matrix.push(rowArray);
   }
 
-  // console.log(matrix);
-
   return matrix;
+}
+
+/* 行列の値をセット */
+function setMatrixValueToTable(matrix, tableName) {
+  const table = document.getElementById(tableName);
+  range(4).forEach(idx => {
+    const row = table.childNodes[idx + 1];
+    const rowElem = row.childNodes;
+    range(4).forEach(jdx => {
+      const val = matrix[idx][jdx];
+      rowElem[jdx].value = val;
+    })
+  })
 }
 
 /* Buttonのリスナーを設定 */
@@ -50,7 +60,8 @@ calcButton.onclick = () => {
   const table2 = document.getElementById('table-2');
   const matrix1 = getMatrixValues(table1);
   const matrix2 = getMatrixValues(table2);
-  calcMatrixNormal(matrix1, matrix2);
+  
+  setMatrixValueToTable(calcMatrixNormal(matrix1, matrix2), 'table-3');
 }
 
 function generateTableDOM(headText, tableIdx, table, hasDefaultVal, magnification) {
