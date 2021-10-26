@@ -3,11 +3,13 @@ const range = n => [...Array(n).keys()];
 const table = document.getElementById('table');
 const wrapper = document.getElementById('wrapper');
 
+// worker
+const myWorker = new Worker('worker.js');
+
 const transpose = a => a[0].map((_, c) => a.map(r => r[c]));
 
 /* シングルスレッドで行列の値を計算 */
 const calcMatrixNormal = (m1, m2) => {
-  m2 = transpose(m2);
   const result = range(4).map(idx => {
     const row = m1[idx];
     return range(4).map(jdx => {
@@ -16,7 +18,6 @@ const calcMatrixNormal = (m1, m2) => {
         const rv = row[cv] * col[cv];
         return pv + rv;
       }, 0)
-      console.log(val);
       return val;
     })
   })
@@ -53,14 +54,26 @@ function setMatrixValueToTable(matrix, tableName) {
   })
 }
 
+myWorker.onmessage = (ev => {
+  // 行列の表示
+  setMatrixValueToTable(ev.data, 'table-4');
+})
+
+/* worker生成 */
+function doWorker(m1, m2) {
+  // workerに行列を送信
+  myWorker.postMessage([m1, m2]);
+}
+
 /* Buttonのリスナーを設定 */
 const calcButton = document.getElementById('calc');
 calcButton.onclick = () => {
   const table1 = document.getElementById('table-1');
   const table2 = document.getElementById('table-2');
   const matrix1 = getMatrixValues(table1);
-  const matrix2 = getMatrixValues(table2);
-  
+  // 2つ目の行列は転置しておく
+  const matrix2 = transpose(getMatrixValues(table2));
+  doWorker(matrix1, matrix2);
   setMatrixValueToTable(calcMatrixNormal(matrix1, matrix2), 'table-3');
 }
 
