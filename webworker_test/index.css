@@ -1,0 +1,9 @@
+#table > *, #wrapper > * {
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 20px;
+  margin: 0;
+  font-weight: normal;
+}
